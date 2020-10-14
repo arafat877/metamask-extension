@@ -172,6 +172,8 @@ describe('gas-modal-page-container container', function () {
         },
         value: '0x640000000000000',
         minimumGasLimit: 21000,
+        hideAdvancedTimeEstimates: false,
+        noFetchOnMount: false,
       }
       const baseMockOwnProps = { transaction: { id: 34 } }
       const tests = [

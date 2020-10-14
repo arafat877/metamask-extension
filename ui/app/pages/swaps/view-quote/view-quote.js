@@ -398,6 +398,8 @@ export default function ViewQuote () {
     ),
     useFastestButtons: true,
     minimumGasLimit: Number(hexToDecimal(nonCustomMaxGasLimit)),
+    noFetchOnMount: true,
+    hideAdvancedTimeEstimates: true,
   }))
 
   const tokenApprovalTextComponent = (

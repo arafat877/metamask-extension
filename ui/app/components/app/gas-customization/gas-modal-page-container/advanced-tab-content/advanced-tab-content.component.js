@@ -28,20 +28,21 @@ export default class AdvancedTabContent extends Component {
     isEthereumNetwork: PropTypes.bool,
     customGasLimitMessage: PropTypes.string,
     minimumGasLimit: PropTypes.number.isRequired,
+    hideAdvancedTimeEstimates: PropTypes.bool,
   }
 
-  renderDataSummary (transactionFee, timeRemaining) {
+  renderDataSummary (transactionFee, timeRemaining, hideAdvancedTimeEstimates) {
     return (
       <div className="advanced-tab__transaction-data-summary">
         <div className="advanced-tab__transaction-data-summary__titles">
           <span>{ this.context.t('newTransactionFee') }</span>
-          <span>~{ this.context.t('transactionTime') }</span>
+          {!hideAdvancedTimeEstimates && <span>~{ this.context.t('transactionTime') }</span>}
         </div>
         <div className="advanced-tab__transaction-data-summary__container">
           <div className="advanced-tab__transaction-data-summary__fee">
             {transactionFee}
           </div>
-          <div className="advanced-tab__transaction-data-summary__time-remaining">{timeRemaining}</div>
+          {!hideAdvancedTimeEstimates && <div className="advanced-tab__transaction-data-summary__time-remaining">{timeRemaining}</div>}
         </div>
       </div>
     )
@@ -69,11 +70,12 @@ export default class AdvancedTabContent extends Component {
       isEthereumNetwork,
       customGasLimitMessage,
       minimumGasLimit,
+      hideAdvancedTimeEstimates,
     } = this.props
 
     return (
       <div className="advanced-tab">
-        { this.renderDataSummary(transactionFee, timeRemaining) }
+        { this.renderDataSummary(transactionFee, timeRemaining, hideAdvancedTimeEstimates) }
         <div className="advanced-tab__fee-chart">
           <div className="advanced-tab__gas-inputs">
             <AdvancedGasInputs
@@ -88,7 +90,7 @@ export default class AdvancedTabContent extends Component {
               minimumGasLimit={minimumGasLimit}
             />
           </div>
-          { isEthereumNetwork
+          { isEthereumNetwork && !hideAdvancedTimeEstimates
             ? (
               <div>
                 <div className="advanced-tab__fee-chart__title">{ t('liveGasPricePredictions') }</div>
@@ -102,7 +104,7 @@ export default class AdvancedTabContent extends Component {
                 </div>
               </div>
             )
-            : <div className="advanced-tab__fee-chart__title">{ t('chartOnlyAvailableEth') }</div>
+            : !hideAdvancedTimeEstimates && <div className="advanced-tab__fee-chart__title">{ t('chartOnlyAvailableEth') }</div>
           }
         </div>
       </div>
