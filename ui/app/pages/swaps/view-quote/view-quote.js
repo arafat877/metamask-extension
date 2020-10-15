@@ -115,7 +115,6 @@ export default function ViewQuote () {
   const topQuote = useSelector(getTopQuote)
   const usedQuote = selectedQuote || topQuote
 
-  const { isBestQuote } = usedQuote
   const fetchParamsSourceToken = fetchParams?.sourceToken
 
   const usedGasLimit = (
@@ -476,7 +475,8 @@ export default function ViewQuote () {
             )}
             destinationDecimals={destinationTokenDecimals}
             destinationSymbol={destinationTokenSymbol}
-            isBestQuote={isBestQuote}
+            sourceIconUrl={selectedFromToken.iconUrl}
+            destinationIconUrl={destinationToken.iconUrl}
           />
         </div>
         <div
