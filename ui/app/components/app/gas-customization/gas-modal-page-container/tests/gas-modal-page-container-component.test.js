@@ -184,8 +184,8 @@ describe('GasModalPageContainer Component', function () {
 
       assert.equal(GP.renderInfoRows.callCount, 2)
 
-      assert.deepEqual(GP.renderInfoRows.getCall(0).args, ['mockNewTotalFiat', 'mockNewTotalEth', 'mockSendAmount', 'mockTransactionFee', { label: 'mockLabel', value: 'mockValue' }])
-      assert.deepEqual(GP.renderInfoRows.getCall(1).args, ['mockNewTotalFiat', 'mockNewTotalEth', 'mockSendAmount', 'mockTransactionFee', { label: 'mockLabel', value: 'mockValue' }])
+      assert.deepEqual(GP.renderInfoRows.getCall(0).args, ['mockNewTotalFiat', 'mockNewTotalEth', 'mockSendAmount', 'mockTransactionFee'])
+      assert.deepEqual(GP.renderInfoRows.getCall(1).args, ['mockNewTotalFiat', 'mockNewTotalEth', 'mockSendAmount', 'mockTransactionFee'])
     })
 
     it('should not render the basic tab if hideBasic is true', function () {
