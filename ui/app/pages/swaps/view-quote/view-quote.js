@@ -67,7 +67,7 @@ import MainQuoteSummary from '../main-quote-summary'
 import { calcGasTotal } from '../../send/send.utils'
 import { getCustomTxParamsData } from '../../confirm-approve/confirm-approve.util'
 import ActionableMessage from '../actionable-message'
-import { quotesToRenderableData, getRenderableGasFeesForQuote } from '../swaps.util'
+import { quotesToRenderableData, getRenderableNetworkFeesForQuote } from '../swaps.util'
 import { useTokenTracker } from '../../../hooks/useTokenTracker'
 import { QUOTES_EXPIRED_ERROR } from '../../../helpers/constants/swaps'
 import CountdownTimer from '../countdown-timer'
@@ -98,7 +98,7 @@ export default function ViewQuote () {
 
   // Select necessary data
   const tradeTxParams = useSelector(getSwapsTradeTxParams)
-  const { gasPrice } = tradeTxParams || {}
+  const { gasPrice, value: tradeValue } = tradeTxParams || {}
   const customMaxGas = useSelector(getCustomSwapsGas)
   const tokenConversionRates = useSelector(getTokenExchangeRates)
   const memoizedTokenConversionRates = useEqualityCheck(tokenConversionRates)
@@ -202,23 +202,29 @@ export default function ViewQuote () {
     sourceTokenValue,
   } = renderableDataForUsedQuote
 
-  const { feeInFiat, feeInEth } = getRenderableGasFeesForQuote(
+  const { feeInFiat, feeInEth } = getRenderableNetworkFeesForQuote(
     usedGasLimit,
     approveGas,
     gasPrice,
     currentCurrency,
     conversionRate,
+    tradeValue,
+    sourceTokenSymbol,
+    usedQuote.sourceAmount,
   )
 
   const {
     feeInFiat: maxFeeInFiat,
     feeInEth: maxFeeInEth,
-  } = getRenderableGasFeesForQuote(
+  } = getRenderableNetworkFeesForQuote(
     maxGasLimit,
     approveGas,
     gasPrice,
     currentCurrency,
     conversionRate,
+    tradeValue,
+    sourceTokenSymbol,
+    usedQuote.sourceAmount,
   )
 
   const tokenCost = (new BigNumber(usedQuote.sourceAmount))
