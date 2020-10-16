@@ -29,6 +29,8 @@ const getBaseApi = function (type) {
       return `https://api.metaswap.codefi.network/aggregatorMetadata`
     case 'feeAmount':
       return `https://api.metaswap.codefi.network/fee`
+    case 'gasPrices':
+      return `https://api.metaswap.codefi.network/gasPrices`
     default:
       throw new Error('getBaseApi requires an api call type')
   }
@@ -266,6 +268,24 @@ export async function fetchTokenBalance (address, userAddress) {
     : Promise.resolve()
   const usersToken = await tokenBalancePromise
   return usersToken
+}
+
+export async function fetchSwapsGasPrices () {
+  const response = await fetchWithCache(getBaseApi('gasPrices'), { method: 'GET' }, { cacheRefreshTime: 15000 })
+
+  const {
+    SafeGasPrice: safeLow,
+    ProposeGasPrice: average,
+    FastGasPrice: fast,
+    LastBlock: blockNum,
+  } = response
+
+  return {
+    safeLow,
+    average,
+    blockNum,
+    fast,
+  }
 }
 
 export function getRenderableGasFeesForQuote (tradeGas, approveGas, gasPrice, currentCurrency, conversionRate) {

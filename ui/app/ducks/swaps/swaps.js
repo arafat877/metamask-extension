@@ -3,6 +3,10 @@ import BigNumber from 'bignumber.js'
 import log from 'loglevel'
 
 import {
+  loadLocalStorageData,
+  saveLocalStorageData,
+} from '../../../lib/local-storage-helpers'
+import {
   addToken,
   addUnapprovedTransaction,
   fetchAndSetQuotes,
@@ -21,7 +25,7 @@ import {
   setSwapsLiveness,
 } from '../../store/actions'
 import { AWAITING_SWAP_ROUTE, BUILD_QUOTE_ROUTE, LOADING_QUOTES_ROUTE, SWAPS_ERROR_ROUTE, SWAPS_MAINTENANCE_ROUTE } from '../../helpers/constants/routes'
-import { fetchSwapsFeatureLiveness } from '../../pages/swaps/swaps.util'
+import { fetchSwapsFeatureLiveness, fetchSwapsGasPrices } from '../../pages/swaps/swaps.util'
 import { calcGasTotal } from '../../pages/send/send.utils'
 import { decimalToHex, getValueFromWeiHex, hexMax, decGWEIToHexWEI, hexToDecimal, decEthToConvertedCurrency } from '../../helpers/utils/conversions.util'
 import { calcTokenAmount } from '../../helpers/utils/token-util'
@@ -38,7 +42,7 @@ import {
   SWAP_FAILED_ERROR,
 } from '../../helpers/constants/swaps'
 import { SWAP, SWAP_APPROVAL } from '../../helpers/constants/transactions'
-import { fetchMetaSwapsGasPriceEstimates, resetCustomGasState } from '../gas/gas.duck'
+import { resetCustomGasState } from '../gas/gas.duck'
 import { formatCurrency } from '../../helpers/utils/confirm-tx.util'
 
 const initialState = {
@@ -51,6 +55,13 @@ const initialState = {
   topAssets: {},
   toToken: null,
   metamaskFeeAmount: null,
+  customGas: {
+    price: null,
+    limit: null,
+    loading: false,
+    priceEstimates: {},
+    priceEstimatesLastRetrieved: 0,
+  },
 }
 
 const slice = createSlice({
@@ -92,6 +103,36 @@ const slice = createSlice({
     setMetamaskFeeAmount: (state, action) => {
       state.metamaskFeeAmount = action.payload
     },
+    setSwapsCustomizationModalPrice: (state, action) => {
+      state.customGas = {
+        ...state.customGas,
+        price: action.payload,
+      }
+    },
+    setSwapsCustomizationModalLimit: (state, action) => {
+      state.customGas = {
+        ...state.customGas,
+        limit: action.payload,
+      }
+    },
+    setSwapGasPriceEstimatesLoadingState: (state, action) => {
+      state.customGas = {
+        ...state.customGas,
+        loading: action.payload,
+      }
+    },
+    setSwapGasPriceEstimates: (state, action) => {
+      state.customGas = {
+        ...state.customGas,
+        priceEstimates: action.payload,
+      }
+    },
+    setSwapsGasPriceEstimatesLastRetrieved: (state, action) => {
+      state.customGas = {
+        ...state.customGas,
+        priceEstimatesLastRetrieved: action.payload,
+      }
+    },
   },
 })
 
@@ -116,6 +157,16 @@ export const getMetaMaskFeeAmount = (state) => state.swaps.metamaskFeeAmount
 export const getFetchingQuotes = (state) => state.swaps.fetchingQuotes
 
 export const getQuotesFetchStartTime = (state) => state.swaps.quotesFetchStartTime
+
+export const getSwapsCustomizationModalPrice = (state) => state.swaps.customGas.price
+
+export const getSwapsCustomizationModalLimit = (state) => state.swaps.customGas.limit
+
+export const getSwapGasEstimateLoadingStatus = (state) => state.swaps.customGas.loading
+
+export const getSwapGasPriceEstimateData = (state) => state.swaps.customGas.priceEstimates
+
+export const getSwapsPriceEstimatesLastRetrieved = (state) => state.swaps.customGas.priceEstimatesLastRetrieved
 
 // Background selectors
 
@@ -201,6 +252,11 @@ const {
   setTopAssets,
   setToToken,
   setMetamaskFeeAmount,
+  setSwapsCustomizationModalPrice,
+  setSwapsCustomizationModalLimit,
+  setSwapGasPriceEstimatesLoadingState,
+  setSwapGasPriceEstimates,
+  setSwapsGasPriceEstimatesLastRetrieved,
 } = actions
 
 export {
@@ -213,6 +269,8 @@ export {
   setTopAssets,
   setToToken as setSwapToToken,
   setMetamaskFeeAmount,
+  setSwapsCustomizationModalPrice,
+  setSwapsCustomizationModalLimit,
 }
 
 export const navigateBackToBuildQuote = (history) => {
@@ -405,6 +463,7 @@ export const fetchQuotesAndSetQuoteState = (history, inputValue, maxSlippage, me
         dispatch(setInitialGasEstimate(selectedAggId))
       }
     } catch (e) {
+      console.log('e', e)
       dispatch(setSwapsErrorKey(ERROR_FETCHING_QUOTES))
     }
 
@@ -533,4 +592,37 @@ export const signAndSendTransactions = (history, metaMetricsEvent) => {
 
     await forceUpdateMetamaskState(dispatch)
   }
+}
+
+export function fetchMetaSwapsGasPriceEstimates () {
+  return async (dispatch, getState) => {
+    const state = getState()
+    const priceEstimatesLastRetrieved = getSwapsPriceEstimatesLastRetrieved(state)
+    const timeLastRetrieved = priceEstimatesLastRetrieved || loadLocalStorageData('METASWAP_GAS_PRICE_ESTIMATES_LAST_RETRIEVED') || 0
+
+    dispatch(setSwapGasPriceEstimatesLoadingState(true))
+
+    let priceEstimates
+    if (Date.now() - timeLastRetrieved > 30000) {
+      priceEstimates = await fetchExternalMetaSwapGasPriceEstimates(dispatch)
+    } else {
+      const cachedPriceEstimates = loadLocalStorageData('METASWAP_GAS_PRICE_ESTIMATES')
+      priceEstimates = cachedPriceEstimates || await fetchExternalMetaSwapGasPriceEstimates(dispatch)
+    }
+
+    dispatch(setSwapGasPriceEstimates(priceEstimates))
+    dispatch(setSwapGasPriceEstimatesLoadingState(false))
+    return priceEstimates
+  }
+}
+
+async function fetchExternalMetaSwapGasPriceEstimates (dispatch) {
+  const priceEstimates = await fetchSwapsGasPrices()
+
+  const timeRetrieved = Date.now()
+  saveLocalStorageData(priceEstimates, 'METASWAP_GAS_PRICE_ESTIMATES')
+  saveLocalStorageData(timeRetrieved, 'METASWAP_GAS_PRICE_ESTIMATES_LAST_RETRIEVED')
+  dispatch(setSwapsGasPriceEstimatesLastRetrieved(timeRetrieved))
+
+  return priceEstimates
 }
