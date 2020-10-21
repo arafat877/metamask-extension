@@ -6,6 +6,7 @@ import InfoTooltip from '../../../components/ui/info-tooltip'
 import { decEthToConvertedCurrency } from '../../../helpers/utils/conversions.util'
 import { formatCurrency } from '../../../helpers/utils/confirm-tx.util'
 import PigIcon from './pig-icon'
+import SavingsTooltip from './savings-tooltip'
 
 export default function FeeCard ({
   primaryFee,
@@ -22,6 +23,8 @@ export default function FeeCard ({
   onQuotesClick,
   conversionRate,
   currentCurrency,
+  tokenConversionRate,
+  tokenSymbol,
 }) {
   const t = useContext(I18nContext)
 
@@ -55,12 +58,24 @@ export default function FeeCard ({
             'fee-card__savings-and-quotes-row--align-left': !canDisplaySavings,
           })}
         >
-          <p className="fee-card__savings-text">
-            {canDisplaySavings
-              ? t('swapSaving', [savingAmount])
-              : t('swapBetterQuoteAvailable')
-            }
-          </p>
+          <div className="fee-card__savings-text-container">
+            <p className="fee-card__savings-text">
+              {canDisplaySavings
+                ? t('swapSaving', [savingAmount])
+                : t('swapBetterQuoteAvailable')
+              }
+            </p>
+            {canDisplaySavings && tokenConversionRate && (
+              <SavingsTooltip
+                savings={savings}
+                conversionRate={conversionRate}
+                currentCurrency={currentCurrency}
+                tokenConversionRate={tokenConversionRate}
+                tokenSymbol={tokenSymbol}
+                metaMaskFee={metaMaskFee}
+              />
+            )}
+          </div>
           <div className="fee-card__quote-link-container" onClick={onQuotesClick}>
             <p className="fee-card__quote-link-text">
               { t('swapNQuotes', [numberOfQuotes]) }
@@ -191,4 +206,6 @@ FeeCard.propTypes = {
   numberOfQuotes: PropTypes.number.isRequired,
   conversionRate: PropTypes.number,
   currentCurrency: PropTypes.string,
+  tokenConversionRate: PropTypes.number,
+  tokenSymbol: PropTypes.string,
 }
