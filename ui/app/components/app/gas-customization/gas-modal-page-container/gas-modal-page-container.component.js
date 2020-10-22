@@ -30,7 +30,6 @@ export default class GasModalPageContainer extends Component {
       newTotalEth: PropTypes.string,
       sendAmount: PropTypes.string,
       transactionFee: PropTypes.string,
-      extraInfoRow: PropTypes.shape({ label: PropTypes.string, value: PropTypes.string }),
     }),
     onSubmit: PropTypes.func,
     customModalGasPriceInHex: PropTypes.string,
@@ -45,7 +44,6 @@ export default class GasModalPageContainer extends Component {
     isRetry: PropTypes.bool,
     disableSave: PropTypes.bool,
     isEthereumNetwork: PropTypes.bool,
-    customGasLimitMessage: PropTypes.string,
   }
 
   componentDidMount () {
@@ -85,7 +83,6 @@ export default class GasModalPageContainer extends Component {
         transactionFee,
       },
       isEthereumNetwork,
-      customGasLimitMessage,
     } = this.props
 
     return (
@@ -94,7 +91,6 @@ export default class GasModalPageContainer extends Component {
         updateCustomGasLimit={updateCustomGasLimit}
         customModalGasPriceInHex={customModalGasPriceInHex}
         customModalGasLimitInHex={customModalGasLimitInHex}
-        customGasLimitMessage={customGasLimitMessage}
         timeRemaining={currentTimeEstimate}
         transactionFee={transactionFee}
         gasChartProps={gasChartProps}
