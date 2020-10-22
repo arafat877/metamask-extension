@@ -197,9 +197,11 @@ export default function ViewQuote () {
     destinationTokenDecimals,
     destinationTokenSymbol,
     destinationTokenValue,
+    destinationIconUrl,
     sourceTokenDecimals,
     sourceTokenSymbol,
     sourceTokenValue,
+    sourceTokenIconUrl,
   } = renderableDataForUsedQuote
 
   const { feeInFiat, feeInEth } = getRenderableGasFeesForQuote(
@@ -475,8 +477,8 @@ export default function ViewQuote () {
             )}
             destinationDecimals={destinationTokenDecimals}
             destinationSymbol={destinationTokenSymbol}
-            sourceIconUrl={selectedFromToken.iconUrl}
-            destinationIconUrl={destinationToken.iconUrl}
+            sourceIconUrl={sourceTokenIconUrl}
+            destinationIconUrl={destinationIconUrl}
           />
         </div>
         <div

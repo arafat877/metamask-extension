@@ -344,6 +344,7 @@ export function quotesToRenderableData (quotes, gasPrice, conversionRate, curren
       destinationTokenDecimals: destinationTokenInfo.decimals,
       destinationTokenSymbol: destinationTokenInfo.symbol,
       destinationTokenValue: formatSwapsValueForDisplay(destinationValue),
+      destinationIconUrl: destinationTokenInfo.iconUrl,
       isBestQuote: quote.isBestQuote,
       liquiditySourceKey,
       feeInEth,
@@ -355,6 +356,7 @@ export function quotesToRenderableData (quotes, gasPrice, conversionRate, curren
       sourceTokenDecimals: sourceTokenInfo.decimals,
       sourceTokenSymbol: sourceTokenInfo.symbol,
       sourceTokenValue: sourceValue,
+      sourceTokenIconUrl: sourceTokenInfo.iconUrl,
       ethValueOfTrade,
       minimumAmountReceived,
     }
