@@ -6,7 +6,7 @@ import { calcGasTotal } from '../../send/send.utils'
 import {
   sumHexWEIsToRenderableFiat,
 } from '../../../helpers/utils/conversions.util'
-import AdvancedTabContent from '../../../components/app/gas-customization/gas-modal-page-container/advanced-tab-content'
+import AdvancedGasInputs from '../../../components/app/gas-customization/advanced-gas-inputs'
 import BasicTabContent from '../../../components/app/gas-customization/gas-modal-page-container/basic-tab-content'
 
 export default class GasModalPageContainer extends Component {
@@ -72,18 +72,31 @@ export default class GasModalPageContainer extends Component {
     } = this.props
 
     return (
-      <AdvancedTabContent
-        updateCustomGasPrice={setSwapsCustomizationModalPrice}
-        updateCustomGasLimit={setSwapsCustomizationModalLimit}
-        customModalGasPriceInHex={customGasPrice}
-        customModalGasLimitInHex={customGasLimit}
-        customGasLimitMessage={customGasLimitMessage}
-        transactionFee={transactionFee}
-        insufficientBalance={insufficientBalance}
-        customPriceIsSafe={customPriceIsSafe}
-        isEthereumNetwork={null}
-        hideAdvancedTimeEstimates
-      />
+      <div className="advanced-tab">
+        <div className="advanced-tab__transaction-data-summary">
+          <div className="advanced-tab__transaction-data-summary__titles">
+            <span>{ this.context.t('newTransactionFee') }</span>
+          </div>
+          <div className="advanced-tab__transaction-data-summary__container">
+            <div className="advanced-tab__transaction-data-summary__fee">
+              {transactionFee}
+            </div>
+          </div>
+        </div>
+        <div className="advanced-tab__fee-chart">
+          <div className="advanced-tab__gas-inputs">
+            <AdvancedGasInputs
+              updateCustomGasPrice={setSwapsCustomizationModalPrice}
+              updateCustomGasLimit={setSwapsCustomizationModalLimit}
+              customGasPrice={customGasPrice}
+              customGasLimit={customGasLimit}
+              insufficientBalance={insufficientBalance}
+              customPriceIsSafe={customPriceIsSafe}
+              customGasLimitMessage={customGasLimitMessage}
+            />
+          </div>
+        </div>
+      </div>
     )
   }
 

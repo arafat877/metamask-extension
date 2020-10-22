@@ -28,21 +28,20 @@ export default class AdvancedTabContent extends Component {
     isEthereumNetwork: PropTypes.bool,
     customGasLimitMessage: PropTypes.string,
     minimumGasLimit: PropTypes.number,
-    hideAdvancedTimeEstimates: PropTypes.bool,
   }
 
-  renderDataSummary (transactionFee, timeRemaining, hideAdvancedTimeEstimates) {
+  renderDataSummary (transactionFee, timeRemaining) {
     return (
       <div className="advanced-tab__transaction-data-summary">
         <div className="advanced-tab__transaction-data-summary__titles">
           <span>{ this.context.t('newTransactionFee') }</span>
-          {!hideAdvancedTimeEstimates && <span>~{ this.context.t('transactionTime') }</span>}
+          <span>~{ this.context.t('transactionTime') }</span>
         </div>
         <div className="advanced-tab__transaction-data-summary__container">
           <div className="advanced-tab__transaction-data-summary__fee">
             {transactionFee}
           </div>
-          {!hideAdvancedTimeEstimates && <div className="advanced-tab__transaction-data-summary__time-remaining">{timeRemaining}</div>}
+          <div className="advanced-tab__transaction-data-summary__time-remaining">{timeRemaining}</div>
         </div>
       </div>
     )
@@ -70,12 +69,11 @@ export default class AdvancedTabContent extends Component {
       isEthereumNetwork,
       customGasLimitMessage,
       minimumGasLimit,
-      hideAdvancedTimeEstimates,
     } = this.props
 
     return (
       <div className="advanced-tab">
-        { this.renderDataSummary(transactionFee, timeRemaining, hideAdvancedTimeEstimates) }
+        { this.renderDataSummary(transactionFee, timeRemaining) }
         <div className="advanced-tab__fee-chart">
           <div className="advanced-tab__gas-inputs">
             <AdvancedGasInputs
@@ -90,7 +88,7 @@ export default class AdvancedTabContent extends Component {
               minimumGasLimit={minimumGasLimit}
             />
           </div>
-          { isEthereumNetwork && !hideAdvancedTimeEstimates
+          { isEthereumNetwork
             ? (
               <div>
                 <div className="advanced-tab__fee-chart__title">{ t('liveGasPricePredictions') }</div>
@@ -104,7 +102,7 @@ export default class AdvancedTabContent extends Component {
                 </div>
               </div>
             )
-            : !hideAdvancedTimeEstimates && <div className="advanced-tab__fee-chart__title">{ t('chartOnlyAvailableEth') }</div>
+            : <div className="advanced-tab__fee-chart__title">{ t('chartOnlyAvailableEth') }</div>
           }
         </div>
       </div>
