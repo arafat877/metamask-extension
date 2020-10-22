@@ -62,11 +62,11 @@ const mapStateToProps = (state) => {
   const swapsGasPriceEstimates = getSwapGasPriceEstimateData(state)
 
   const {
-    slowEstimatData,
+    slowEstimateData,
     averageEstimateData,
-    fastEstimatData,
+    fastEstimateData,
   } = getRenderableGasButtonData(swapsGasPriceEstimates, customGasLimit, true, conversionRate, currentCurrency)
-  const gasButtonInfo = [slowEstimatData, averageEstimateData, fastEstimatData]
+  const gasButtonInfo = [averageEstimateData, fastEstimateData]
 
   const newTotalFiat = sumHexWEIsToRenderableFiat(
     [value, customGasTotal, customTotalSupplement],
