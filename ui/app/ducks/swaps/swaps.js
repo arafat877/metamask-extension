@@ -463,7 +463,6 @@ export const fetchQuotesAndSetQuoteState = (history, inputValue, maxSlippage, me
         dispatch(setInitialGasEstimate(selectedAggId))
       }
     } catch (e) {
-      console.log('e', e)
       dispatch(setSwapsErrorKey(ERROR_FETCHING_QUOTES))
     }
 
