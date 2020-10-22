@@ -62,8 +62,6 @@ describe('gas-modal-page-container container', function () {
                 txData: {
                   id: 34,
                 },
-                extraInfoRow: { label: 'mockLabel', value: 'mockValue' },
-                minimumGasLimit: 21000,
               },
             },
           },

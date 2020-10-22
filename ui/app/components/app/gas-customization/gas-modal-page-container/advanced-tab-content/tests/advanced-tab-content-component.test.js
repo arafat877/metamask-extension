@@ -28,6 +28,7 @@ describe('AdvancedTabContent Component', function () {
         insufficientBalance={false}
         customPriceIsSafe
         isSpeedUp={false}
+        hideAdvancedTimeEstimates={false}
         isEthereumNetwork
       />
     ))
@@ -73,7 +74,7 @@ describe('AdvancedTabContent Component', function () {
 
     it('should call renderDataSummary with the expected params', function () {
       const renderDataSummaryArgs = AdvancedTabContent.prototype.renderDataSummary.getCall(0).args
-      assert.deepEqual(renderDataSummaryArgs, ['$0.25', 21500, undefined])
+      assert.deepEqual(renderDataSummaryArgs, ['$0.25', 21500, false])
     })
   })
 
