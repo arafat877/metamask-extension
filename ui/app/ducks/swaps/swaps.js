@@ -28,6 +28,7 @@ import { AWAITING_SWAP_ROUTE, BUILD_QUOTE_ROUTE, LOADING_QUOTES_ROUTE, SWAPS_ERR
 import { fetchSwapsFeatureLiveness, fetchSwapsGasPrices } from '../../pages/swaps/swaps.util'
 import { calcGasTotal } from '../../pages/send/send.utils'
 import { decimalToHex, getValueFromWeiHex, hexMax, decGWEIToHexWEI, hexToDecimal, decEthToConvertedCurrency } from '../../helpers/utils/conversions.util'
+import { conversionGreaterThan } from '../../helpers/utils/conversion-util'
 import { calcTokenAmount } from '../../helpers/utils/token-util'
 import {
   getFastPriceEstimateInHexWEI,
@@ -167,6 +168,32 @@ export const getSwapGasEstimateLoadingStatus = (state) => state.swaps.customGas.
 export const getSwapGasPriceEstimateData = (state) => state.swaps.customGas.priceEstimates
 
 export const getSwapsPriceEstimatesLastRetrieved = (state) => state.swaps.customGas.priceEstimatesLastRetrieved
+
+export function isCustomSwapsGasPriceSafe (state) {
+  const { average } = getSwapGasPriceEstimateData(state)
+
+  const customGasPrice = getSwapsCustomizationModalPrice(state)
+
+  if (!customGasPrice) {
+    return true
+  }
+
+  if (average === null) {
+    return false
+  }
+
+  const customPriceSafe = conversionGreaterThan(
+    {
+      value: customGasPrice,
+      fromNumericBase: 'hex',
+      fromDenomination: 'WEI',
+      toDenomination: 'GWEI',
+    },
+    { value: average, fromNumericBase: 'dec' },
+  )
+
+  return customPriceSafe
+}
 
 // Background selectors
 

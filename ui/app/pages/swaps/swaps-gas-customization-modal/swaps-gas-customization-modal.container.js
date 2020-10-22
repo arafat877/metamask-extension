@@ -8,7 +8,6 @@ import {
   getCurrentCurrency,
   getCurrentEthBalance,
   getDefaultActiveButtonIndex,
-  isCustomPriceSafe,
   getRenderableGasButtonData,
 } from '../../../selectors'
 
@@ -19,6 +18,7 @@ import {
   getSwapGasPriceEstimateData,
   setSwapsCustomizationModalPrice,
   setSwapsCustomizationModalLimit,
+  isCustomSwapsGasPriceSafe,
 } from '../../../ducks/swaps/swaps'
 
 import {
@@ -89,7 +89,7 @@ const mapStateToProps = (state) => {
   return {
     customGasPrice,
     customGasLimit,
-    customPriceIsSafe: isCustomPriceSafe(state, true),
+    customPriceIsSafe: isCustomSwapsGasPriceSafe(state),
     gasPriceButtonGroupProps: {
       buttonDataLoading,
       defaultActiveButtonIndex: getDefaultActiveButtonIndex(gasButtonInfo, customGasPrice),
