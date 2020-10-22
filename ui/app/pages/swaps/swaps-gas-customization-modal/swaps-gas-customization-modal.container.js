@@ -16,8 +16,8 @@ import {
   getSwapsCustomizationModalLimit,
   getSwapGasEstimateLoadingStatus,
   getSwapGasPriceEstimateData,
-  setSwapsCustomizationModalPrice,
-  setSwapsCustomizationModalLimit,
+  swapCustomGasModalPriceEdited,
+  swapCustomGasModalLimitEdited,
   isCustomSwapsGasPriceSafe,
 } from '../../../ducks/swaps/swaps'
 
@@ -128,10 +128,10 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(hideModal())
     },
     setSwapsCustomizationModalPrice: (newPrice) => {
-      dispatch(setSwapsCustomizationModalPrice(newPrice))
+      dispatch(swapCustomGasModalPriceEdited(newPrice))
     },
     setSwapsCustomizationModalLimit: (newLimit) => {
-      dispatch(setSwapsCustomizationModalLimit(newLimit))
+      dispatch(swapCustomGasModalLimitEdited(newLimit))
     },
   }
 }

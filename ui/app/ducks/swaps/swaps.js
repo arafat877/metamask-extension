@@ -103,34 +103,30 @@ const slice = createSlice({
     setMetamaskFeeAmount: (state, action) => {
       state.metamaskFeeAmount = action.payload
     },
-    setSwapsCustomizationModalPrice: (state, action) => {
+    swapCustomGasModalPriceEdited: (state, action) => {
       state.customGas = {
         ...state.customGas,
         price: action.payload,
       }
     },
-    setSwapsCustomizationModalLimit: (state, action) => {
+    swapCustomGasModalLimitEdited: (state, action) => {
       state.customGas = {
         ...state.customGas,
         limit: action.payload,
       }
     },
-    setSwapGasPriceEstimatesLoadingState: (state, action) => {
+    swapGasPriceEstimatesFetchStarted: (state, action) => {
       state.customGas = {
         ...state.customGas,
         loading: action.payload,
       }
     },
-    setSwapGasPriceEstimates: (state, action) => {
+    swapGasPriceEstimatesFetchCompleted: (state, action) => {
       state.customGas = {
         ...state.customGas,
-        priceEstimates: action.payload,
-      }
-    },
-    setSwapsGasPriceEstimatesLastRetrieved: (state, action) => {
-      state.customGas = {
-        ...state.customGas,
-        priceEstimatesLastRetrieved: action.payload,
+        priceEstimates: action.payload.priceEstimates,
+        loading: action.payload.loading,
+        priceEstimatesLastRetrieved: action.payload.priceEstimatesLastRetrieved,
       }
     },
   },
@@ -270,6 +266,8 @@ const {
   clearSwapsState,
   navigatedBackToBuildQuote,
   retriedGetQuotes,
+  swapGasPriceEstimatesFetchCompleted,
+  swapGasPriceEstimatesFetchStarted,
   setAggregatorMetadata,
   setBalanceError,
   setFetchingQuotes,
@@ -278,11 +276,8 @@ const {
   setTopAssets,
   setToToken,
   setMetamaskFeeAmount,
-  setSwapsCustomizationModalPrice,
-  setSwapsCustomizationModalLimit,
-  setSwapGasPriceEstimatesLoadingState,
-  setSwapGasPriceEstimates,
-  setSwapsGasPriceEstimatesLastRetrieved,
+  swapCustomGasModalPriceEdited,
+  swapCustomGasModalLimitEdited,
 } = actions
 
 export {
@@ -295,8 +290,8 @@ export {
   setTopAssets,
   setToToken as setSwapToToken,
   setMetamaskFeeAmount,
-  setSwapsCustomizationModalPrice,
-  setSwapsCustomizationModalLimit,
+  swapCustomGasModalPriceEdited,
+  swapCustomGasModalLimitEdited,
 }
 
 export const navigateBackToBuildQuote = (history) => {
@@ -624,29 +619,26 @@ export function fetchMetaSwapsGasPriceEstimates () {
     const priceEstimatesLastRetrieved = getSwapsPriceEstimatesLastRetrieved(state)
     const timeLastRetrieved = priceEstimatesLastRetrieved || loadLocalStorageData('METASWAP_GAS_PRICE_ESTIMATES_LAST_RETRIEVED') || 0
 
-    dispatch(setSwapGasPriceEstimatesLoadingState(true))
+    dispatch(swapGasPriceEstimatesFetchStarted(true))
 
     let priceEstimates
     if (Date.now() - timeLastRetrieved > 30000) {
-      priceEstimates = await fetchExternalMetaSwapGasPriceEstimates(dispatch)
+      priceEstimates = await fetchSwapsGasPrices()
     } else {
       const cachedPriceEstimates = loadLocalStorageData('METASWAP_GAS_PRICE_ESTIMATES')
-      priceEstimates = cachedPriceEstimates || await fetchExternalMetaSwapGasPriceEstimates(dispatch)
+      priceEstimates = cachedPriceEstimates || await fetchSwapsGasPrices()
     }
 
-    dispatch(setSwapGasPriceEstimates(priceEstimates))
-    dispatch(setSwapGasPriceEstimatesLoadingState(false))
+    const timeRetrieved = Date.now()
+
+    saveLocalStorageData(priceEstimates, 'METASWAP_GAS_PRICE_ESTIMATES')
+    saveLocalStorageData(timeRetrieved, 'METASWAP_GAS_PRICE_ESTIMATES_LAST_RETRIEVED')
+
+    dispatch(swapGasPriceEstimatesFetchCompleted({
+      priceEstimates,
+      loading: false,
+      priceEstimatesLastRetrieved: timeRetrieved,
+    }))
     return priceEstimates
   }
-}
-
-async function fetchExternalMetaSwapGasPriceEstimates (dispatch) {
-  const priceEstimates = await fetchSwapsGasPrices()
-
-  const timeRetrieved = Date.now()
-  saveLocalStorageData(priceEstimates, 'METASWAP_GAS_PRICE_ESTIMATES')
-  saveLocalStorageData(timeRetrieved, 'METASWAP_GAS_PRICE_ESTIMATES_LAST_RETRIEVED')
-  dispatch(setSwapsGasPriceEstimatesLastRetrieved(timeRetrieved))
-
-  return priceEstimates
 }
