@@ -90,7 +90,7 @@ const mapStateToProps = (state) => {
   return {
     customGasPrice,
     customGasLimit,
-    customPriceIsSafe: isCustomPriceSafe(state),
+    customPriceIsSafe: isCustomPriceSafe(state, true),
     gasPriceButtonGroupProps: {
       buttonDataLoading,
       defaultActiveButtonIndex: getDefaultActiveButtonIndex(gasButtonInfo, customGasPrice),
