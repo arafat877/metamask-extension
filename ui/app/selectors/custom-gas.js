@@ -88,22 +88,8 @@ export function getSafeLowEstimate (state) {
   return safeLow
 }
 
-export function getAverageEstimate (state) {
-  const {
-    gas: {
-      basicEstimates: {
-        average,
-      },
-    },
-  } = state
-
-  return average
-}
-
-export function isCustomPriceSafe (state, averageIsSafe) {
+export function isCustomPriceSafe (state) {
   const safeLow = getSafeLowEstimate(state)
-  const average = getAverageEstimate(state)
-  const safeMinimumPrice = averageIsSafe ? average : safeLow
 
   const customGasPrice = getCustomGasPrice(state)
 
@@ -111,7 +97,7 @@ export function isCustomPriceSafe (state, averageIsSafe) {
     return true
   }
 
-  if (safeMinimumPrice === null) {
+  if (safeLow === null) {
     return false
   }
 
@@ -122,7 +108,7 @@ export function isCustomPriceSafe (state, averageIsSafe) {
       fromDenomination: 'WEI',
       toDenomination: 'GWEI',
     },
-    { value: safeMinimumPrice, fromNumericBase: 'dec' },
+    { value: safeLow, fromNumericBase: 'dec' },
   )
 
   return customPriceSafe
